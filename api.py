@@ -40,24 +40,28 @@ def categorize_age(age):
 
 class Database:
     def __init__(self):
+        HOST = 'localhost'
+        DATABASE = 'postgres'
+        USER = 'postgres'
+        PASSWORD = 'postgres'
         self.conn = psycopg2.connect(
-            dbname='recommendation',
-            user='postgres',
-            password='postgres',
-            host='localhost',
-            port='5100'
+            dbname=DATABASE,
+            user=USER,
+            password=PASSWORD,
+            host=HOST,
+            port='5432'
         )
         self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
 
-    def list_items(self):
-        self.cursor.execute("SELECT itemA FROM rules LIMIT 30")
+    def get_list_user(self):
+        self.cursor.execute("SELECT * FROM public.user")
         result = self.cursor.fetchall()
         return result
 
     def get_recommendation_items(self, payload):
         user = self.cursor.execute("SELECT * FROM public.user where id = %s", (payload["user_id"]))
         user = self.cursor.fetchone()
-        gender = user["gender"]
+        gender = user["gender"].lower()
         age = categorize_age(user["age"])
         age_group = categorize_age_group(user["age"])
         age_group_gender = f"{age_group}_{gender}"
@@ -70,14 +74,14 @@ class Database:
         print("age_interest_rules_rcm", age_interest_rules_rcm)
 
         self.cursor.execute(
-            "SELECT consequents FROM gender_interest_rules WHERE antecedents = %s ORDER BY lift DESC LIMIT %s",
+            "SELECT consequents FROM gender_interest_rules WHERE lower(antecedents) = %s ORDER BY lift DESC LIMIT %s",
             (gender, payload["limit"])
         )
         gender_interest_rules_rcm = self.cursor.fetchall()
         print("gender_interest_rules_rcm", gender_interest_rules_rcm)
 
         self.cursor.execute(
-            "SELECT consequents FROM age_gender_interest_rules WHERE antecedents = %s ORDER BY lift DESC LIMIT %s",
+            "SELECT consequents FROM age_gender_interest_rules WHERE lower(antecedents) = %s ORDER BY lift DESC LIMIT %s",
             (age_group_gender, payload["limit"])
         )
         age_gender_interest_rules_rcm = self.cursor.fetchall()
@@ -108,10 +112,10 @@ class UserCreate(BaseModel):
     gender: str
 
 
-@app.get("/all_items")
+@app.get("/get_list_user")
 async def get_all_items():
     db = Database()
-    items = db.list_items()
+    items = db.get_list_user()
     return {"data": items}
 
 @app.post("/get_recommendation")
