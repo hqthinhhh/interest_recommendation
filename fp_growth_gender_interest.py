@@ -39,6 +39,8 @@ def clean_prefix(itemset):
 rules["antecedents"] = rules["antecedents"].apply(clean_prefix)
 rules["consequents"] = rules["consequents"].apply(clean_prefix)
 
+rules = rules[["antecedents","consequents","antecedent support","consequent support","support","confidence","lift"]]
+
 # Save final rules
 rules.to_csv("results/gender_interest_recommendation_rules.csv", index=False)
 print(f"Final rules saved to 'gender_interest_recommendation_rules.csv'. {len(rules)} rules generated.")

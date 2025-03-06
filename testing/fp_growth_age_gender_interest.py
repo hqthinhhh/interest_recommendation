@@ -38,6 +38,9 @@ def normalize_frozenset(fset):
 rules["antecedents"] = rules["antecedents"].apply(normalize_frozenset)
 rules["consequents"] = rules["consequents"].apply(normalize_frozenset)
 
+rules = rules[["antecedents","consequents","antecedent support","consequent support","support","confidence","lift"]]
+
 # Save final rules
 rules.to_csv("results/gender_and_age_interest_recommendation_rules.csv", index=False)
 print(f"Final rules saved to 'interest_recommendation_rules.csv'. {len(rules)} rules generated.")
+
