@@ -12,3 +12,4 @@ step chạy test:
 pip install -r requirements.txt
 (phải cài db postgres)
 uvicorn api:app --reload
+api document in http://127.0.0.1:8000/docs
