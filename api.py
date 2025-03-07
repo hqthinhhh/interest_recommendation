@@ -113,7 +113,7 @@ class UserCreate(BaseModel):
 
 
 @app.get("/get_list_user")
-async def get_all_items():
+async def get_all_users():
     db = Database()
     items = db.get_list_user()
     return items
@@ -126,7 +126,7 @@ async def get_recommendation(payload: RecommendationRequest):
     return recommendations
 
 @app.post("/user")
-async def get_recommendation(payload: UserCreate):
+async def create_user(payload: UserCreate):
     db = Database()
     user_create = payload.model_dump()
     user = db.insert_user(user_create)
