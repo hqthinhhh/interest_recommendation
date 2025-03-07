@@ -41,7 +41,7 @@ def categorize_age(age):
 class Database:
     def __init__(self):
         HOST = 'localhost'
-        DATABASE = 'postgres'
+        DATABASE = 'recommendation'
         USER = 'postgres'
         PASSWORD = 'postgres'
         self.conn = psycopg2.connect(
@@ -49,7 +49,7 @@ class Database:
             user=USER,
             password=PASSWORD,
             host=HOST,
-            port='5432'
+            port='5100'
         )
         self.cursor = self.conn.cursor(cursor_factory=RealDictCursor)
 
@@ -100,7 +100,7 @@ class Database:
         )
         user_id = self.cursor.fetchone()["id"]
         self.conn.commit()
-        return {"id": user_id}
+        return user_id
 
 class RecommendationRequest(BaseModel):
     user_id: str
@@ -116,21 +116,21 @@ class UserCreate(BaseModel):
 async def get_all_items():
     db = Database()
     items = db.get_list_user()
-    return {"data": items}
+    return items
 
 @app.post("/get_recommendation")
 async def get_recommendation(payload: RecommendationRequest):
     db = Database()
     payload = payload.model_dump()
     recommendations = db.get_recommendation_items(payload)
-    return {"data": recommendations}
+    return recommendations
 
 @app.post("/user")
 async def get_recommendation(payload: UserCreate):
     db = Database()
     user_create = payload.model_dump()
     user = db.insert_user(user_create)
-    return {"data": user}
+    return user
 
 if __name__ == "__main__":
     db = Database()
