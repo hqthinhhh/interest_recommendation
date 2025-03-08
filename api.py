@@ -3,8 +3,17 @@ from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def categorize_age_group(age):
     if age < 18:
@@ -125,7 +134,7 @@ async def get_recommendation(payload: RecommendationRequest):
     recommendations = db.get_recommendation_items(payload)
     return recommendations
 
-@app.post("/user")
+@app.post("/user/")
 async def create_user(payload: UserCreate):
     db = Database()
     user_create = payload.model_dump()
